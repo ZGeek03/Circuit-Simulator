@@ -10,13 +10,14 @@
 using namespace std;
 
 int ReadCircuit(Circuit* MC, string fileName);
-int ReadInitConditions(priority_queue<Event*>* EQ, fstream* IF);
+int ReadInitConditions(priority_queue<Event*>* EQ);
 int SimulateCircuit(priority_queue<Event*> *EQ);
 int PrintResults();
 
 int main() {
 	string fileName;
 	priority_queue<Event*> EventQueue;
+	Circuit MainCircuit;
 	fstream InitFile;
 	InitFile.open("circuit0_v.txt");
 
@@ -24,7 +25,7 @@ int main() {
 	cin >> fileName;
 	cout << endl;
 
-	int read = ReadCircuit(&EventQueue, fileName);
+	int read = ReadCircuit(&MainCircuit, fileName);
 
 	if (read == 1) {
 		cout << "Problem opening file with the requested name." << endl
@@ -33,7 +34,7 @@ int main() {
 	}
 	
 
-	int init = ReadInitConditions(&InitFile);
+	int init = ReadInitConditions(&EventQueue);
 
 	int simulated = SimulateCircuit(&EventQueue);
 
@@ -54,7 +55,7 @@ int ReadCircuit(Circuit* MC, string fileName) {
 		return 1;
 	}
 	// 1. Get Circuit Header
-	for (int i = 2; i > 0; i++) {
+	for (int i = 2; i > 0; i--) {
 		CircuitFile >> FileLine;
 		FileLinePart.push_back(FileLine);
 	}
@@ -65,7 +66,7 @@ int ReadCircuit(Circuit* MC, string fileName) {
 	FileLinePart.clear();
 
 	// 2. Get and set INPUT PAD DEFINITIONS
-	for (int i = 3; i > 0; i++) {
+	for (int i = 3; i > 0; i--) {
 		CircuitFile >> FileLine;
 		FileLinePart.push_back(FileLine);
 	}
@@ -73,7 +74,7 @@ int ReadCircuit(Circuit* MC, string fileName) {
 	FileLinePart.clear();
 
 	// 3. Get and set OUTPUT PAD DEFINITIONS
-	for (int i = 3; i > 0; i++) {
+	for (int i = 3; i > 0; i--) {
 		CircuitFile >> FileLine;
 		FileLinePart.push_back(FileLine);
 	}
@@ -81,24 +82,28 @@ int ReadCircuit(Circuit* MC, string fileName) {
 	FileLinePart.clear();
 
 	// 4. Get and set GATE DEFINITIONS
-	for (int i = 5; i > 0; i++) {
+	for (int i = 5; i > 0; i--) {
 		CircuitFile >> FileLine;
 		FileLinePart.push_back(FileLine);
 	}
 
 	FileLinePart.clear();
 
+	cout << "Read circuit definition successfully." << endl;
 	return 0;
 }
 
-int ReadInitConditions(priority_queue<Event*>* EQ, fstream *IF) {
+int ReadInitConditions(priority_queue<Event*>* EQ) {
+	cout << "Read initial conditions successfully." << endl;
 	return 0;
 }
 
 int SimulateCircuit(priority_queue<Event*> *EQ) {
+	cout << "Successfully simulated circuit." << endl;
 	return 0;
 }
 
 int PrintResults() {
+	cout << "Printed results." << endl;
 	return 0;
 }

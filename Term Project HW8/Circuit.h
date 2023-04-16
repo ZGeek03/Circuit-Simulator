@@ -10,16 +10,16 @@ using namespace std;
 class Circuit {
 	public:
 		Circuit();
-		void AddGate(Gate *gateToAdd);
-		void AddWire(Wire *wireToAdd);
-		void SetCircuitName(string const name);
-		Gate* GetGate(int idx) const;
-		Wire* GetWire(string name) const;
+		void   AddGate(Gate *gateToAdd);
+		void   AddWire(Wire *wireToAdd);
+		void   SetCircuitName(string const name);
+		Gate*  GetGate(int idx) const;
+		Wire*  GetWire(string name) const;
 		string GetCircuitName() const;
 
 	private:
 		vector<Gate*> AllGates;
 		vector<Wire*> AllWires;
-		string CircuitName;
+		string        CircuitName;
 
 };
