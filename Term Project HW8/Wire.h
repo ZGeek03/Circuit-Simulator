@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <queue>
+#include <string>
 #include "Gate.h"
 #include "Event.h"
 
@@ -15,7 +16,7 @@ class Wire {
 		void          SetNum(int const num);
 		void          SetHistory(char const histRecord);
 		void          SetDrives(Gate* const gateToDrive);
-		char          GetName()      const;
+		string        GetName()      const;
 		int           GetNum()       const;
 		char          GetState()     const;
 		void          PrintHistory() const;
@@ -23,7 +24,7 @@ class Wire {
 		vector<char>  GetHistory()   const;
 
 	private:
-		char          name;
+		string        name;
 		int           num;
 		char          state;
 		vector<Gate*> drives;
