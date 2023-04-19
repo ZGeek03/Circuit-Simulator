@@ -2,23 +2,4 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/Term Project HW8/x64/Debug/Wire.obj
-/Term Project HW8/x64/Debug/vc143.pdb
-/Term Project HW8/x64/Debug/vc143.idb
-/Term Project HW8/x64/Debug/Term Project HW8.tlog/Term Project HW8.lastbuildstate
-/Term Project HW8/x64/Debug/Term Project HW8.tlog/link.write.1.tlog
-/Term Project HW8/x64/Debug/Term Project HW8.tlog/link.read.1.tlog
-/Term Project HW8/x64/Debug/Term Project HW8.tlog/link.command.1.tlog
-/Term Project HW8/x64/Debug/Term Project HW8.tlog/CL.write.1.tlog
-/Term Project HW8/x64/Debug/Term Project HW8.tlog/CL.read.1.tlog
-/Term Project HW8/x64/Debug/Term Project HW8.tlog/CL.command.1.tlog
-/Term Project HW8/x64/Debug/Term Project HW8.log
-/Term Project HW8/x64/Debug/Term Project HW8.ilk
-/Term Project HW8/x64/Debug/Term Project HW8.exe.recipe
-/Term Project HW8/x64/Debug/Gate.obj
-/Term Project HW8/x64/Debug/Event.obj
-/Term Project HW8/x64/Debug/Circuit Sim.obj
-/Term Project HW8/Term Project HW8.vcxproj.user
-/Term Project HW8/Term Project HW8.vcxproj.filters
-/Term Project HW8/Term Project HW8.vcxproj
-/.vs
+
