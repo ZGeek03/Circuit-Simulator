@@ -16,11 +16,17 @@ void   Wire::SetHistory(char const histRecord) { history.push_back(histRecord); 
 
 void   Wire::SetDrives(Gate* const gateToDrive) { drives.push_back(gateToDrive); }
 
+void   Wire::SetName(string const na) { name = na; }
+
+void   Wire::SetIsInput(bool const isIn) { isInput = isIn; }
+
 string Wire::GetName() const { return name; }
 
 int    Wire::GetNum() const { return num; }
 
 char   Wire::GetState() const { return state; }
+
+bool   Wire::GetIsInput() const { return isInput; }
 
 vector<Gate*> Wire::GetDrives() const { return drives; }
 

@@ -45,7 +45,7 @@ int main() {
 
 // Each function returns an int regarding the error status.
 // Return of 1 means error opening file.
-int ReadCircuit(Circuit* MC, string fileName) {
+int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
 	fstream CircuitFile;
 	vector<string> FileLinePart;
 	string FileLine;
@@ -63,47 +63,32 @@ int ReadCircuit(Circuit* MC, string fileName) {
 	// Set the Circuit's name appropriately.
 	MC->SetCircuitName(FileLinePart.at(1));
 
+	// Clear some things to prepare for future data processing.
+	getline(CircuitFile, FileLine);
 	FileLinePart.clear();
 
-	// 2. Get and set INPUT PAD DEFINITIONS
-	for (int i = 3; i > 0; i--) {
-		CircuitFile >> FileLine;
-		FileLinePart.push_back(FileLine);
+	while (!CircuitFile.eof()) {
+		getline(CircuitFile, FileLine);
+
+		MC->ParseCircuitFile(FileLine);
 	}
-
-	FileLinePart.clear();
-
-	// 3. Get and set OUTPUT PAD DEFINITIONS
-	for (int i = 3; i > 0; i--) {
-		CircuitFile >> FileLine;
-		FileLinePart.push_back(FileLine);
-	}
-
-	FileLinePart.clear();
-
-	// 4. Get and set GATE DEFINITIONS
-	for (int i = 5; i > 0; i--) {
-		CircuitFile >> FileLine;
-		FileLinePart.push_back(FileLine);
-	}
-
-	FileLinePart.clear();
+	
 
 	cout << "Read circuit definition successfully." << endl;
 	return 0;
 }
 
-int ReadInitConditions(priority_queue<Event*>* EQ) {
+int ReadInitConditions(priority_queue<Event*>* EQ) { // TODO
 	cout << "Read initial conditions successfully." << endl;
 	return 0;
 }
 
-int SimulateCircuit(priority_queue<Event*> *EQ) {
+int SimulateCircuit(priority_queue<Event*> *EQ) { // TODO
 	cout << "Successfully simulated circuit." << endl;
 	return 0;
 }
 
-int PrintResults() {
+int PrintResults() { // TODO
 	cout << "Printed results." << endl;
 	return 0;
 }

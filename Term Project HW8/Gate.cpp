@@ -1,8 +1,6 @@
 #include"Gate.h"
 
 
-enum Gate::GateType {AND, NAND, OR, NOR, XOR, XNOR, NOT};
-
 Gate::Gate(GateType t, int d, Wire* o, Wire* i1, Wire* i2) {
 	type  =  t;
 	delay =  d;

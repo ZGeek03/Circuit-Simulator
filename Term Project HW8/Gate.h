@@ -7,7 +7,7 @@ class Wire;
 
 class Gate {
 	public:
-		enum  GateType;
+		enum  GateType { AND, NAND, OR, NOR, XOR, XNOR, NOT };
 		Gate(GateType type, int delay, Wire* out, Wire* in1, Wire* in2 = nullptr);
 
 		int    GetDelay()               const;

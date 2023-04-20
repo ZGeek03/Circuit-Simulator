@@ -16,9 +16,12 @@ class Wire {
 		void          SetNum(int const num);
 		void          SetHistory(char const histRecord);
 		void          SetDrives(Gate* const gateToDrive);
+		void          SetName(string const name);
+		void          SetIsInput(bool const isIn);
 		string        GetName()      const;
 		int           GetNum()       const;
 		char          GetState()     const;
+		bool          GetIsInput()   const;
 		void          PrintHistory() const;
 		vector<Gate*> GetDrives()    const;
 		vector<char>  GetHistory()   const;
@@ -29,4 +32,5 @@ class Wire {
 		char          state;
 		vector<Gate*> drives;
 		vector<char>  history;
+		bool          isInput;
 };
