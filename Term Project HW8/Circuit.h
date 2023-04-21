@@ -16,13 +16,13 @@ class Circuit {
 		void   ParseCircuitFile(string const line);
 		Gate*  GetGate(int idx)     const;
 		Wire*  GetWire(string name) const;
-		Wire* GetWire(int num) const;
+		Wire*  GetWire(int num) const;
 		string GetCircuitName()     const;
 
 	private:
 		vector<Gate*> AllGates;
 		vector<Wire*> AllWires;
 		string        CircuitName;
-		enum          LineTypes { INPUT, OUTPUT, GATE };
+		enum          LineTypes { INPUT, OUTPUT, GATE, NOTGATE };
 
 };

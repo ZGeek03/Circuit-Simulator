@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="Circuit Sim.cpp" />
     <ClCompile Include="Circuit.cpp" />
+    <ClCompile Include="CompareEvent.h" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="Gate.cpp" />
     <ClCompile Include="Wire.cpp" />

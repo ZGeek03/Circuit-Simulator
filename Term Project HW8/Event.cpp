@@ -1,15 +1,16 @@
 #include "Event.h"
+#include <string>
 
 using namespace std;
 
-Event::Event(int wn, int t, char s, int ec) {
-	wireNum = wn;
+Event::Event(string wn, int t, char s, int ec) {
+	wireName = wn;
 	time = t;
 	state = s;
 	evtCount = ec;
 }
 
-int Event::GetWireNum() const { return wireNum; }
+string Event::GetWireName() const { return wireName; }
 
 int Event::GetTime() const { return time; }
 

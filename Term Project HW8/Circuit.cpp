@@ -28,6 +28,17 @@ vector<string> SplitLine(string const line) {
 	return lineParts;
 }
 
+// Parse what gate we are parsing from the circuit description file.
+Gate::GateType ParseType(string const type) {
+	if (type == "AND") { return Gate::GateType::AND; }
+	else if (type == "OR") { return Gate::GateType::OR; }
+	else if (type == "XOR") { return Gate::GateType::XOR; }
+	else if (type == "NAND") { return Gate::GateType::NAND; }
+	else if (type == "NOR") { return Gate::GateType::NOR; }
+	else if (type == "XNOR") { return Gate::GateType::XNOR; }
+	else if (type == "NOT") { return Gate::GateType::NOT; }
+}
+
 Circuit::Circuit() { }
 
 void Circuit::AddGate(Gate *gateToAdd) {
@@ -57,6 +68,7 @@ void Circuit::ParseCircuitFile(string const line) {
 	else if (type == "AND" || type == "OR" || type == "XOR"
 		 || type == "NAND" || type == "NOR" || type == "XNOR")
 	{ typeIdentifier = GATE; }
+	else if (type == "NOT") { typeIdentifier = NOTGATE; }
 
 	linePart.clear();
 
@@ -86,17 +98,26 @@ void Circuit::ParseCircuitFile(string const line) {
 
 		// FileLineParts is in the following Order: { Delay, wireOut, wireIn1, wireIn2 }
 		case GATE:
+		case NOTGATE:
 			int delay;
 			Wire *out, *in1, *in2;
+			Gate* newGate;
 
 			delay = stoi(FileLineParts.at(1));
 			in1 = GetWire(stoi(FileLineParts.at(2)));
-			in2 = GetWire(stoi(FileLineParts.at(3)));
-			out = GetWire(stoi(FileLineParts.at(4)));
+			// Handle the edge case we have a NOT gate, which only has 1 input.
+			if (typeIdentifier == NOTGATE) {
+				out = GetWire(stoi(FileLineParts.at(3)));
 
-// TODO: Fix the enum setting so that it can handle all types of gates.
+				newGate = new Gate(ParseType(type), delay, out, in1);
+			}
+			else {
+				in2 = GetWire(stoi(FileLineParts.at(3)));
+				out = GetWire(stoi(FileLineParts.at(4)));
 
-			Gate* newGate = new Gate(Gate::GateType::AND, delay, out, in1, in2);
+				newGate = new Gate(ParseType(type), delay, out, in1, in2);
+			}
+
 
 			AllGates.push_back(newGate);
 
