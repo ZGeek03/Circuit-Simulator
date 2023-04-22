@@ -55,7 +55,6 @@ int main() {
 // Each function returns an int regarding the error status.
 // Return of 1 means error opening file.
 // Read the main circuit definition file, saving the details to a Circuit object.
-// TODO: Figure out how to add wires for between gates as necessary.
 int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
 	fstream CircuitFile;
 	vector<string> FileLinePart;
@@ -63,7 +62,7 @@ int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
 	CircuitFile.open(fileName);
 
 	if (!CircuitFile.is_open()) { return 1; }
-	// 1. Get Circuit Header
+	// Get Circuit Header
 	for (int i = 2; i > 0; i--) {
 		CircuitFile >> FileLine;
 		FileLinePart.push_back(FileLine);

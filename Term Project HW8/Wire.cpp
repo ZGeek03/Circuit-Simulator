@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-Wire::Wire(char na, int nu, char st) {
+Wire::Wire(string na, int nu, char st) {
 	name  = na;
 	num   = nu;
 	state = st;

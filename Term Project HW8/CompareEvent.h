@@ -9,6 +9,7 @@ using namespace std;
 
 struct CompareEvent {
 	bool operator()(Event const *e1, Event const *e2) {
-		return e1->GetTime() < e2->GetTime();
+		if (e1->GetTime() == e2->GetTime()) { return e1->GetEvtCount() > e2->GetEvtCount(); }
+		return e1->GetTime() > e2->GetTime();
 	}
 };

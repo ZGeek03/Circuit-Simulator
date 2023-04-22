@@ -1,3 +1,4 @@
 ﻿  Circuit.cpp
-C:\Users\zgeek\source\repos\Circuit Simulator\Term Project HW8\Circuit.cpp(40): warning C4715: 'ParseType': not all control paths return a value
-  Term Project HW8.vcxproj -> C:\Users\zgeek\source\repos\Circuit Simulator\x64\Debug\Term Project HW8.exe
+C:\Users\zgeek\source\repos\Circuit-Simulator\Term Project HW8\Circuit.cpp(40): warning C4715: 'ParseType': not all control paths return a value
+C:\Users\zgeek\source\repos\Circuit-Simulator\Term Project HW8\Circuit.cpp(172): warning C4715: 'Circuit::GetWire': not all control paths return a value
+  Term Project HW8.vcxproj -> C:\Users\zgeek\Source\Repos\Circuit-Simulator\x64\Debug\Term Project HW8.exe

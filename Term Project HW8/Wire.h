@@ -11,7 +11,7 @@ class Gate;
 
 class Wire {
 	public:
-		Wire(char name = 'A', int num = -1, char state = 'X');
+		Wire(string name = "X", int num = -1, char state = 'X');
 
 		void          SetNum(int const num);
 		void          SetHistory(char const histRecord);
