@@ -21,8 +21,6 @@ int main() {
 	// The parameters allows for custom ordering rules for the object in priority_queue.
 	priority_queue<Event*, vector<Event*>, CompareEvent> EventQueue;
 	Circuit MainCircuit;
-	fstream InitFile;
-	InitFile.open("circuit0_v.txt");
 
 	cout << "Please enter the name of your Circuit File." << endl << ">> ";
 	cin >> fileName;
@@ -129,6 +127,7 @@ int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ,
 	}
 
 	cout << "Read initial conditions successfully." << endl;
+	VectorFile.close();
 	return 0;
 }
 
