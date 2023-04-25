@@ -20,6 +20,8 @@ void   Wire::SetName(string const na) { name = na; }
 
 void   Wire::SetIsInput(bool const isIn) { isInput = isIn; }
 
+void   Wire::SetState(char const st) { state = st; }
+
 string Wire::GetName() const { return name; }
 
 int    Wire::GetNum() const { return num; }

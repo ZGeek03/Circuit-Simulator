@@ -18,6 +18,7 @@ class Wire {
 		void          SetDrives(Gate* const gateToDrive);
 		void          SetName(string const name);
 		void          SetIsInput(bool const isIn);
+		void          SetState(char const state);
 		string        GetName()      const;
 		int           GetNum()       const;
 		char          GetState()     const;
