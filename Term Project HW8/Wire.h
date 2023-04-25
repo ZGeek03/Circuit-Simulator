@@ -11,13 +11,14 @@ class Gate;
 
 class Wire {
 	public:
-		Wire(char name = 'A', int num = -1, char state = 'X');
+		Wire(string name = "X", int num = -1, char state = 'X');
 
 		void          SetNum(int const num);
 		void          SetHistory(char const histRecord);
 		void          SetDrives(Gate* const gateToDrive);
 		void          SetName(string const name);
 		void          SetIsInput(bool const isIn);
+		void          SetState(char const state);
 		string        GetName()      const;
 		int           GetNum()       const;
 		char          GetState()     const;

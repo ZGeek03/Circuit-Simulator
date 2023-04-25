@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-Wire::Wire(char na, int nu, char st) {
+Wire::Wire(string na, int nu, char st) {
 	name  = na;
 	num   = nu;
 	state = st;
@@ -19,6 +19,8 @@ void   Wire::SetDrives(Gate* const gateToDrive) { drives.push_back(gateToDrive);
 void   Wire::SetName(string const na) { name = na; }
 
 void   Wire::SetIsInput(bool const isIn) { isInput = isIn; }
+
+void   Wire::SetState(char const st) { state = st; }
 
 string Wire::GetName() const { return name; }
 

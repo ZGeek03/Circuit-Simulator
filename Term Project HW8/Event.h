@@ -5,7 +5,7 @@ using namespace std;
 
 class Event {
 	public:
-		Event(string wireNum, int time, char state, int evtCount);
+		Event(string wireName, int time, char state, int evtCount);
 		string GetWireName() const;
 		int    GetTime()     const;
 		char   GetState()    const;

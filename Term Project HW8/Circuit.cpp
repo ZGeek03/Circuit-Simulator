@@ -45,7 +45,7 @@ void Circuit::AddGate(Gate *gateToAdd) {
 	AllGates.push_back(gateToAdd);
 }
 
-void Circuit::AddWire(Wire* wireToAdd) {
+void Circuit::AddWire(Wire *wireToAdd) {
 	AllWires.push_back(wireToAdd);
 }
 
@@ -103,19 +103,32 @@ void Circuit::ParseCircuitFile(string const line) {
 			Wire *out, *in1, *in2;
 			Gate* newGate;
 
+			// Find some initial values of the first input and the gate delay.
 			delay = stoi(FileLineParts.at(1));
 			in1 = GetWire(stoi(FileLineParts.at(2)));
+
 			// Handle the edge case we have a NOT gate, which only has 1 input.
 			if (typeIdentifier == NOTGATE) {
+				// find the other wire that are supposed to connect to the gate.
 				out = GetWire(stoi(FileLineParts.at(3)));
 
 				newGate = new Gate(ParseType(type), delay, out, in1);
+
+				// Set the Drives of the wires involved in the gate, only 2 because its a NOT.
+				in1->SetDrives(newGate);
+				out->SetDrives(newGate);
 			}
 			else {
+				// find the other wires that are supposed to connect to the gate.
 				in2 = GetWire(stoi(FileLineParts.at(3)));
 				out = GetWire(stoi(FileLineParts.at(4)));
 
 				newGate = new Gate(ParseType(type), delay, out, in1, in2);
+				
+				// Set the Drives of the wires involved in the gate.
+				in1->SetDrives(newGate);
+				in2->SetDrives(newGate);
+				out->SetDrives(newGate);
 			}
 
 
@@ -143,14 +156,19 @@ Wire* Circuit::GetWire(string name) const {
 	return AllWires.at(0);
 }
 // Overload for above function that allows to search for wireNum instead.
-Wire* Circuit::GetWire(int num) const {
+Wire* Circuit::GetWire(int num) {
+	bool hit = false;
 	for (int i = 0; i < AllWires.size(); i++) {
 		if (AllWires.at(i)->GetNum() == num) {
+			hit = true;
 			return AllWires.at(i);
 		}
 	}
-
-	return AllWires.at(0);
+	if (!hit) {
+		Wire *newWire = new Wire("X", num, 'X');
+		AddWire(newWire);
+		return newWire;
+	}
 }
 
 string Circuit::GetCircuitName() const { return CircuitName; }

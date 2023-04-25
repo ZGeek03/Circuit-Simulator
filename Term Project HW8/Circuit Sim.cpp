@@ -11,13 +11,14 @@
 using namespace std;
 
 int ReadCircuit(Circuit* MC, string fileName);
-int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ, string fileName);
-int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ);
+int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ, string fileName, int *eventCount);
+int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ, Circuit* MC, int *eventCount);
 int PrintResults();
 vector<string> VectorSplitLine(string const line);
 
 int main() {
 	string fileName;
+	int curEventCount = 0;
 	// The parameters allows for custom ordering rules for the object in priority_queue.
 	priority_queue<Event*, vector<Event*>, CompareEvent> EventQueue;
 	Circuit MainCircuit;
@@ -35,7 +36,7 @@ int main() {
 	}
 	
 
-	int init = ReadInitConditions(&EventQueue, fileName);
+	int init = ReadInitConditions(&EventQueue, fileName, &curEventCount);
 
 	if (init == 1) {
 		cout << "Problem opening vector file with the requested name." << endl
@@ -43,7 +44,7 @@ int main() {
 		return init;
 	}
 
-	int simulated = SimulateCircuit(&EventQueue);
+	int simulated = SimulateCircuit(&EventQueue, &MainCircuit, &curEventCount);
 
 	int printed = PrintResults();
 
@@ -53,7 +54,6 @@ int main() {
 // Each function returns an int regarding the error status.
 // Return of 1 means error opening file.
 // Read the main circuit definition file, saving the details to a Circuit object.
-// TODO: Figure out how to add wires for between gates as necessary.
 int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
 	fstream CircuitFile;
 	vector<string> FileLinePart;
@@ -61,7 +61,7 @@ int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
 	CircuitFile.open(fileName);
 
 	if (!CircuitFile.is_open()) { return 1; }
-	// 1. Get Circuit Header
+	// Get Circuit Header
 	for (int i = 2; i > 0; i--) {
 		CircuitFile >> FileLine;
 		FileLinePart.push_back(FileLine);
@@ -91,11 +91,10 @@ int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
 
 // Read the initial conditions, and future circuit conditions from Vector File, saving each
 // event to a priority_queue storing Event objects.
-int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ, string fileName) { // DONE-------------------
+int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ, string fileName, int *eventCount) { // DONE-------------------
 	fstream VectorFile;
 	vector<string> FileLinePart;
 	string FileLine, vectoredFN;
-	int EventCount = 0;
 	int nameEnd = fileName.find('.');
 
 	// Format file name and open vector file.
@@ -120,9 +119,9 @@ int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ,
 		char   state    = (FileLinePart.at(3))[0]; // Get the first character in string
 
 		// Push an Event object with the characteristics retreived above.
-		EQ->push(new Event(WireName, time, state, EventCount));
+		EQ->push(new Event(WireName, time, state, *eventCount));
 
-		EventCount++;
+		(*eventCount)++;
 		getline(VectorFile, FileLine);
 	}
 
@@ -131,8 +130,45 @@ int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ,
 	return 0;
 }
 
+// TODO: Fix setting wires and creating Events for Inputs vs. Outputs.
+int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ, Circuit* MC, int *eventCount) { // TODO
+	int circuitTime = 0, newEventTime;
+	char newState;
+	string newEventWName;
+	Event* newEvent;
 
-int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ) { // TODO
+	while (circuitTime < 60 && !EQ->empty()) {
+		Event* nextEvent = EQ->top();
+
+		// Get and set the next state of the wire.
+		Wire* modifiedW = MC->GetWire(nextEvent->GetWireName());
+		modifiedW->SetState(nextEvent->GetState());
+
+		// Append the change to the wire history.
+		modifiedW->SetHistory(nextEvent->GetState());
+
+		// Evaluate the gate connected, and see if the output will change.
+		vector<Gate*> modifiedWGates = modifiedW->GetDrives();
+
+		for (int i = 0; i < modifiedWGates.size(); i++) {
+			// Exercise the logic
+			newState = modifiedWGates.at(i)->ExerciseLogic();
+
+			// Create event for output change
+			newEventTime = circuitTime + modifiedWGates.at(i)->GetDelay();
+			newEventWName = modifiedWGates.at(i)->GetOutput()->GetName();
+			newEvent = new Event(newEventWName, newEventTime, newState, *eventCount);
+			(*eventCount)++;
+
+			// Append the new event to the Event Queue.
+			EQ->push(newEvent);
+		}
+		// Delete the top Event in the EQ since we handled it.
+		EQ->pop();
+
+		// Modify circuitTime according to the event timestamp.
+		circuitTime = nextEvent->GetTime();
+	}
 
 	cout << "Successfully simulated circuit." << endl;
 	return 0;
