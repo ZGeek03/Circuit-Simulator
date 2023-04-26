@@ -2,4 +2,4 @@ CIRCUIT SimpleCircuit
 INPUT   A    1
 INPUT   B    2
 OUTPUT  C    3
-AND     3ns  1   2   3
+XOR     3ns  1   2   3

@@ -41,16 +41,15 @@ Gate::GateType ParseType(string const type) {
 
 Circuit::Circuit() { }
 
-void Circuit::AddGate(Gate *gateToAdd) {
-	AllGates.push_back(gateToAdd);
-}
+void Circuit::AddGate(Gate *gateToAdd) { AllGates.push_back(gateToAdd); }
 
-void Circuit::AddWire(Wire *wireToAdd) {
-	AllWires.push_back(wireToAdd);
-}
+void Circuit::AddWire(Wire *wireToAdd) { AllWires.push_back(wireToAdd); }
 
 void Circuit::SetCircuitName(string const name) { CircuitName = name; }
 
+void Circuit::SetIsFeedback(bool const isFeed) { IsFeedbackLoop = isFeed; }
+
+// Fully parse a line from the Circuit Description file.
 void Circuit::ParseCircuitFile(string const line) {
 	string type, linePart;
 	stringstream li(line);
@@ -90,6 +89,7 @@ void Circuit::ParseCircuitFile(string const line) {
 			newWire->SetName(FileLineParts.at(1));
 			newWire->SetNum(stoi(FileLineParts.at(2)));
 			newWire->SetIsInput(false);
+			newWire->SetHistory('X');
 
 			AllWires.push_back(newWire);
 
@@ -129,6 +129,11 @@ void Circuit::ParseCircuitFile(string const line) {
 				in1->SetDrives(newGate);
 				in2->SetDrives(newGate);
 				out->SetDrives(newGate);
+
+				if (in1 == out || in2 == out) {
+					out->SetIsInput(true);
+					SetIsFeedback(true);
+				}
 			}
 
 
@@ -137,6 +142,34 @@ void Circuit::ParseCircuitFile(string const line) {
 			break;
 	}
 }
+
+
+// Overload for above function that allows to search for wireNum instead.
+Wire* Circuit::GetWire(int num) {
+	bool hit = false;
+	for (int i = 0; i < AllWires.size(); i++) {
+		if (AllWires.at(i)->GetNum() == num) {
+			hit = true;
+			return AllWires.at(i);
+		}
+	}
+	if (!hit) {
+		string wireName = "X" + to_string(num);
+		Wire *newWire = new Wire(wireName, num, 'X');
+		newWire->SetIsInput(true);
+		AddWire(newWire);
+		return newWire;
+	}
+}
+
+// Just returns the entire vector of wires.
+vector<Wire*> Circuit::GetWire() const {
+	return AllWires;
+}
+
+string Circuit::GetCircuitName() const { return CircuitName; }
+
+bool   Circuit::IsFeedback() const { return IsFeedbackLoop; }
 
 // Returns a gate in our circuit, based on the order it was placed
 // into the simulator. Returns the oldest gate by default.
@@ -155,20 +188,11 @@ Wire* Circuit::GetWire(string name) const {
 
 	return AllWires.at(0);
 }
-// Overload for above function that allows to search for wireNum instead.
-Wire* Circuit::GetWire(int num) {
-	bool hit = false;
-	for (int i = 0; i < AllWires.size(); i++) {
-		if (AllWires.at(i)->GetNum() == num) {
-			hit = true;
-			return AllWires.at(i);
-		}
-	}
-	if (!hit) {
-		Wire *newWire = new Wire("X", num, 'X');
-		AddWire(newWire);
-		return newWire;
-	}
-}
 
-string Circuit::GetCircuitName() const { return CircuitName; }
+// Clear the circuit variables to prepare for subsequent simulation runs.
+void Circuit::ClearCircuit() {
+	AllGates.clear();
+	AllWires.clear();
+	CircuitName.clear();
+	SetIsFeedback(false);
+}

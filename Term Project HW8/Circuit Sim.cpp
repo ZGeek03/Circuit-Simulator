@@ -13,48 +13,56 @@ using namespace std;
 int ReadCircuit(Circuit* MC, string fileName);
 int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ, string fileName, int *eventCount);
 int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ, Circuit* MC, int *eventCount);
-int PrintResults();
+void PrintResults(Circuit *MC, int circuitTime);
 vector<string> VectorSplitLine(string const line);
+bool CheckForDuplicateEvent(priority_queue<Event*, vector<Event*>, CompareEvent> const EQ, Event* const EvtToCheck);
 
 int main() {
-	string fileName;
+	string fileName = " ";
 	int curEventCount = 0;
 	// The parameters allows for custom ordering rules for the object in priority_queue.
 	priority_queue<Event*, vector<Event*>, CompareEvent> EventQueue;
 	Circuit MainCircuit;
 
-	cout << "Please enter the name of your Circuit File." << endl << ">> ";
-	cin >> fileName;
-	cout << endl;
+	// Input loop to allow for multiple file tests.
+	while (true) {
+		// Prepare to run the simulation again.
+		MainCircuit.ClearCircuit();
+		while (!EventQueue.empty()) { EventQueue.pop(); }
 
-	int read = ReadCircuit(&MainCircuit, fileName);
+		// Each of the 4 functions below represent a step in the simulation process.
+		cout << "Please enter the name of your Circuit File, including file extension. Submit 'q' to quit." << endl << ">> ";
+		cin >> fileName;
+		cout << endl;
+		if (fileName == "q") { break; }
 
-	if (read == 1) {
-		cout << "Problem opening file with the requested name." << endl
-			<< "Verify you spelled it correctly and try again." << endl;
-		return read;
+		int read = ReadCircuit(&MainCircuit, fileName);
+		if (read == 1) {
+			cout << "Problem opening file with the requested name." << endl
+				<< "Verify you spelled it correctly and try again." << endl;
+			return read;
+		}
+
+
+		int init = ReadInitConditions(&EventQueue, fileName, &curEventCount);
+		if (init == 1) {
+			cout << "Problem opening vector file with the requested name." << endl
+				<< "Verify the file is in the same folder as definition file." << endl;
+			return init;
+		}
+
+
+		int simulatedTime = SimulateCircuit(&EventQueue, &MainCircuit, &curEventCount);
+
+
+		PrintResults(&MainCircuit, simulatedTime);
 	}
-	
-
-	int init = ReadInitConditions(&EventQueue, fileName, &curEventCount);
-
-	if (init == 1) {
-		cout << "Problem opening vector file with the requested name." << endl
-			<< "Verify the file is in the same folder as definition file." << endl;
-		return init;
-	}
-
-	int simulated = SimulateCircuit(&EventQueue, &MainCircuit, &curEventCount);
-
-	int printed = PrintResults();
-
 	return 0;
 }
 
-// Each function returns an int regarding the error status.
-// Return of 1 means error opening file.
+
 // Read the main circuit definition file, saving the details to a Circuit object.
-int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
+int ReadCircuit(Circuit* MC, string fileName) {
 	fstream CircuitFile;
 	vector<string> FileLinePart;
 	string FileLine;
@@ -91,7 +99,7 @@ int ReadCircuit(Circuit* MC, string fileName) { // DONE-----------------------
 
 // Read the initial conditions, and future circuit conditions from Vector File, saving each
 // event to a priority_queue storing Event objects.
-int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ, string fileName, int *eventCount) { // DONE-------------------
+int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ, string fileName, int *eventCount) {
 	fstream VectorFile;
 	vector<string> FileLinePart;
 	string FileLine, vectoredFN;
@@ -130,8 +138,8 @@ int ReadInitConditions(priority_queue<Event*, vector<Event*>, CompareEvent>* EQ,
 	return 0;
 }
 
-// TODO: Fix setting wires and creating Events for Inputs vs. Outputs.
-int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ, Circuit* MC, int *eventCount) { // TODO
+// Returns the total runtime in ns.
+int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ, Circuit* MC, int *eventCount) {
 	int circuitTime = 0, newEventTime;
 	char newState;
 	string newEventWName;
@@ -142,45 +150,93 @@ int SimulateCircuit(priority_queue<Event*, vector<Event*>, CompareEvent> *EQ, Ci
 
 		// Get and set the next state of the wire.
 		Wire* modifiedW = MC->GetWire(nextEvent->GetWireName());
-		modifiedW->SetState(nextEvent->GetState());
 
-		// Append the change to the wire history.
-		modifiedW->SetHistory(nextEvent->GetState());
+		if (nextEvent->GetTime() > circuitTime) {
+			modifiedW->SetHistory(nextEvent->GetTime());
+		}
+
+		// Set next state of the wire.
+		modifiedW->SetState(nextEvent->GetState());
 
 		// Evaluate the gate connected, and see if the output will change.
 		vector<Gate*> modifiedWGates = modifiedW->GetDrives();
 
+		// Modify circuitTime according to the event timestamp.
+		circuitTime = nextEvent->GetTime();
+
 		for (int i = 0; i < modifiedWGates.size(); i++) {
-			// Exercise the logic
-			newState = modifiedWGates.at(i)->ExerciseLogic();
 
-			// Create event for output change
-			newEventTime = circuitTime + modifiedWGates.at(i)->GetDelay();
-			newEventWName = modifiedWGates.at(i)->GetOutput()->GetName();
-			newEvent = new Event(newEventWName, newEventTime, newState, *eventCount);
-			(*eventCount)++;
+			if (modifiedW->IsInput() && 
+				(modifiedW == modifiedWGates.at(i)->GetInput(1) || 
+				 modifiedW == modifiedWGates.at(i)->GetInput(2))  ) {
+				// Exercise the logic
+				newState = modifiedWGates.at(i)->ExerciseLogic();
 
-			// Append the new event to the Event Queue.
-			EQ->push(newEvent);
+				// Do the following only if it is not the very first initial event. 
+				// Since nothing else is initialized, it will create a junk output 
+				// event if not skipped.
+
+				// Create event for output change
+				if (nextEvent->GetEvtCount() != 0) {
+					newEventTime = circuitTime + modifiedWGates.at(i)->GetDelay();
+					newEventWName = modifiedWGates.at(i)->GetOutput()->GetName();
+					newEvent = new Event(newEventWName, newEventTime, newState, *eventCount);
+					(*eventCount)++;
+
+
+					// Append the new event to the Event Queue.
+					if (!CheckForDuplicateEvent(*EQ, newEvent)) {
+						EQ->push(newEvent);
+					}
+					
+				}
+				// This logic catches the case in which we have a feedback loop, in which we
+				// actually do determine the output on the first Event.
+				else if (MC->IsFeedback()) {
+					newEventTime = circuitTime + modifiedWGates.at(i)->GetDelay();
+					newEventWName = modifiedWGates.at(i)->GetOutput()->GetName();
+					newEvent = new Event(newEventWName, newEventTime, newState, *eventCount);
+					(*eventCount)++;
+
+
+					// Append the new event to the Event Queue.
+					EQ->push(newEvent);
+				}
+			}
 		}
 		// Delete the top Event in the EQ since we handled it.
 		EQ->pop();
 
-		// Modify circuitTime according to the event timestamp.
-		circuitTime = nextEvent->GetTime();
+		// Append the change to the wire history.
+		modifiedW->SetHistory(nextEvent->GetState());
+
+		// Fill in Wire Histories for the current time.
+		vector<Wire*> AllWires = MC->GetWire();
+		for (int i = 0; i < AllWires.size(); i++) {
+			AllWires.at(i)->SetHistory(circuitTime);
+		}
+
 	}
 
-	cout << "Successfully simulated circuit." << endl;
-	return 0;
+	cout << "Successfully simulated circuit, printing results." << endl << endl;
+	return circuitTime;
 }
 
-int PrintResults() { // TODO
-	cout << "Printed results." << endl;
-	return 0;
+// Print the simulation results in a visually useful way.
+void PrintResults(Circuit *MC, int circuitTime) {
+	vector<Wire*> AllWire = MC->GetWire();
+
+	for (int i = 0; i < AllWire.size(); i++) {
+		if ((AllWire.at(i)->GetName().find('X')) == string::npos) {
+			AllWire.at(i)->PrintHistory();
+			cout << endl;
+		}
+	}
+	cout << endl << "Circuit Name: " << MC->GetCircuitName() << endl;
+	cout << "Circuit Runtime: " << circuitTime << "ns" << endl << endl;
 }
 
 // Extra function needed to process Vector File.
-// TODO: Decide if this needs moved to Event class.
 vector<string> VectorSplitLine(string const line) {
 	vector<string> lineParts;
 	string linePart;
@@ -202,4 +258,20 @@ vector<string> VectorSplitLine(string const line) {
 	lineParts.push_back(linePart);
 
 	return lineParts;
+}
+
+// Function to check for duplicate Event object in Event priority_queue
+bool CheckForDuplicateEvent(priority_queue<Event*, vector<Event*>, CompareEvent> EQ, Event* const EvtToCheck) {
+	Event* QEvent;
+	char EVCstate = EvtToCheck->GetState();
+	int EVCtime = EvtToCheck->GetTime();
+
+	// Loops through the copy of the priority_queue, looking for any duplicate Events.
+	while (!EQ.empty()) {
+		QEvent = EQ.top();
+		if (QEvent->IsDuplicate(EVCstate, EVCtime)) { return true; }
+		EQ.pop();
+	}
+
+	return false;
 }

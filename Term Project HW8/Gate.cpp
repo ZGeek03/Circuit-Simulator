@@ -29,8 +29,8 @@ char Gate::ExerciseLogic() const {
 	switch (type) {
 	case NOT:
 		if (in1->GetState() == '0') { return '1'; }
-		else if (in1->GetState() == 'X') { return 'X'; }
-		else { return '0'; }
+		else if (in1->GetState() == '1') { return '0'; }
+		else { return 'X'; }
 		break;
 
 	case AND:
@@ -45,23 +45,25 @@ char Gate::ExerciseLogic() const {
 		break;
 
 	case NAND:
-		if (in1->GetState() != '1' && in2->GetState() != '1') { return '1'; }
+		if (in1->GetState() == '1' && in2->GetState() == '1') { return '0'; }
 		else if ((in1->GetState() == 'X' && in2->GetState() == '1') ||
-			(in2->GetState() == 'X' && in1->GetState() == '1')) {
+			(in2->GetState() == 'X' && in1->GetState() == '1') ||
+			(in2->GetState() == 'X' && in1->GetState() == 'X')) {
 			return 'X';
 		}
-		else { return '0'; }
+		else { return '1'; }
 		break;
 
 	case OR:
-		if (in1->GetState() != '0' || in2->GetState() != '0') {
-			return '1';
+		if (in1->GetState() == '0' && in2->GetState() == '0') {
+			return '0';
 		}
 		else if ((in1->GetState() == 'X' && in2->GetState() == '0') ||
-			(in2->GetState() == 'X' && in1->GetState() == '0')) {
+			(in2->GetState() == 'X' && in1->GetState() == '0') ||
+			(in2->GetState() == 'X' && in1->GetState() == 'X')) {
 			return 'X';
 		}
-		else { return '0'; }
+		else { return '1'; }
 		break;
 
 	case NOR:
@@ -69,18 +71,19 @@ char Gate::ExerciseLogic() const {
 			return '1';
 		}
 		else if ((in1->GetState() == 'X' && in2->GetState() == '0') ||
-			(in2->GetState() == 'X' && in1->GetState() == '0')) {
+			(in2->GetState() == 'X' && in1->GetState() == '0') ||
+			(in2->GetState() == 'X' && in1->GetState() == 'X')) {
 			return 'X';
 		}
 		else { return '0'; }
 		break;
 
 	case XOR:
-		if (in1->GetState() != in2->GetState()) { return '1'; }
+		if (in1->GetState() == in2->GetState()) { return '0'; }
 		else if (in1->GetState() == 'X' || in2->GetState() == 'X') {
 			return 'X';
 		}
-		else { return '0'; }
+		else { return '1'; }
 		break;
 
 	case XNOR:

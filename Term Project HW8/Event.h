@@ -10,6 +10,7 @@ class Event {
 		int    GetTime()     const;
 		char   GetState()    const;
 		int    GetEvtCount() const;
+		bool   IsDuplicate(char const state, int const time);
 		
 
 	private:
